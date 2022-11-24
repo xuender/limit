@@ -3,6 +3,6 @@ package limit
 import "errors"
 
 var (
-	ErrFull    = errors.New("queue full")
 	ErrTimeOut = errors.New("time out")
+	ErrKey     = errors.New("key not exist")
 )

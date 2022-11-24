@@ -4,15 +4,17 @@ import "time"
 
 const _timeOut = time.Microsecond * 100
 
-type Limit[T any] struct {
+// Limiter channel based rate limit.
+type Limiter[T any] struct {
 	interval time.Duration
 	last     time.Time
 	elems    chan T
 	yield    func(T)
 }
 
-func NewLimit[T any](qps int, timeOut time.Duration, yield func(T)) *Limit[T] {
-	res := &Limit[T]{yield: yield}
+// NewLimiter returns a new limiter.
+func NewLimiter[T any](qps int, timeOut time.Duration, yield func(T)) *Limiter[T] {
+	res := &Limiter[T]{yield: yield}
 
 	if qps > 0 {
 		size := qps * int(timeOut/time.Second)
@@ -31,7 +33,7 @@ func NewLimit[T any](qps int, timeOut time.Duration, yield func(T)) *Limit[T] {
 	return res
 }
 
-func (p *Limit[T]) limit() {
+func (p *Limiter[T]) limit() {
 	for elem := range p.elems {
 		dur := time.Since(p.last)
 
@@ -46,11 +48,8 @@ func (p *Limit[T]) limit() {
 	}
 }
 
-func (p *Limit[T]) Close() {
-	close(p.elems)
-}
-
-func (p *Limit[T]) Add(elem T) error {
+// Add return a error.
+func (p *Limiter[T]) Add(elem T) error {
 	if p.interval == 0 {
 		p.yield(elem)
 
@@ -63,4 +62,9 @@ func (p *Limit[T]) Add(elem T) error {
 	case <-time.After(_timeOut):
 		return ErrTimeOut
 	}
+}
+
+// Close channel.
+func (p *Limiter[T]) Close() {
+	close(p.elems)
 }

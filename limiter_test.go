@@ -8,22 +8,22 @@ import (
 	"github.com/xuender/limit"
 )
 
-func TestNewLimit(t *testing.T) {
+func TestNewLimiter(t *testing.T) {
 	t.Parallel()
 
-	lim := limit.NewLimit(1, time.Second, func(num int) { time.Sleep(time.Microsecond) })
+	lim := limit.NewLimiter(1, time.Second, func(num int) { time.Sleep(time.Microsecond) })
 
 	assert.Nil(t, lim.Add(1))
 	assert.Nil(t, lim.Add(1))
 	assert.NotNil(t, lim.Add(1))
 
-	lim = limit.NewLimit(1, time.Millisecond, func(num int) { time.Sleep(time.Microsecond) })
+	lim = limit.NewLimiter(1, time.Millisecond, func(num int) { time.Sleep(time.Microsecond) })
 
 	assert.Nil(t, lim.Add(1))
 	assert.Nil(t, lim.Add(1))
 	assert.NotNil(t, lim.Add(1))
 
-	lim = limit.NewLimit(1000, time.Millisecond, func(num int) { time.Sleep(time.Microsecond) })
+	lim = limit.NewLimiter(1000, time.Millisecond, func(num int) { time.Sleep(time.Microsecond) })
 
 	assert.Nil(t, lim.Add(1))
 	assert.Nil(t, lim.Add(1))
@@ -32,10 +32,10 @@ func TestNewLimit(t *testing.T) {
 	lim.Close()
 }
 
-func TestLimitAdd(t *testing.T) {
+func TestLimiterAdd(t *testing.T) {
 	t.Parallel()
 
-	lim := limit.NewLimit(0, time.Second, func(num int) { time.Sleep(time.Microsecond) })
+	lim := limit.NewLimiter(0, time.Second, func(num int) { time.Sleep(time.Microsecond) })
 
 	assert.Nil(t, lim.Add(1))
 	assert.Nil(t, lim.Add(1))
