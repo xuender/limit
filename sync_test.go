@@ -25,5 +25,12 @@ func TestSync_Wait(t *testing.T) {
 	}()
 
 	ass.Nil(sync.Wait())
+}
+
+func TestSync_Close(t *testing.T) {
+	t.Parallel()
+
+	sync := limit.NewSync(1, time.Second)
+
 	sync.Close()
 }
