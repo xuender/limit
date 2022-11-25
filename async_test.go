@@ -42,8 +42,9 @@ func TestLimiterAdd(t *testing.T) {
 	ass := assert.New(t)
 	limiter := limit.NewAsync(0, time.Second, func(num int) { time.Sleep(time.Microsecond) })
 
+	defer limiter.Close()
+
 	ass.Nil(limiter.Add(1))
 	ass.Nil(limiter.Add(1))
 	ass.Nil(limiter.Add(1))
-	limiter.Close()
 }

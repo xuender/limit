@@ -14,6 +14,8 @@ type Async[T any] struct {
 
 // NewAsync returns a new async rate limit.
 //
+// qps less than 1 unlimited.
+//
 // Play: https://go.dev/play/p/W9gYA_109Vz
 func NewAsync[T any](qps int, timeOut time.Duration, yield func(T)) *Async[T] {
 	limiter := &Async[T]{yield: yield}
@@ -68,7 +70,9 @@ func (p *Async[T]) Add(elem T) error {
 
 // Close channel.
 func (p *Async[T]) Close() {
-	close(p.elems)
+	if p.elems != nil {
+		close(p.elems)
+	}
 }
 
 // Len returns channel length.
