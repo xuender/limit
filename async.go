@@ -70,3 +70,8 @@ func (p *Async[T]) Add(elem T) error {
 func (p *Async[T]) Close() {
 	close(p.elems)
 }
+
+// Len returns channel length.
+func (p *Async[T]) Len() int {
+	return len(p.elems)
+}

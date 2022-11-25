@@ -35,3 +35,8 @@ func (p *Sync) Wait() error {
 func (p *Sync) Close() {
 	p.limiter.Close()
 }
+
+// Len returns channel length.
+func (p *Sync) Len() int {
+	return p.limiter.Len()
+}

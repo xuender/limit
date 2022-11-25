@@ -32,5 +32,6 @@ func TestSync_Close(t *testing.T) {
 
 	sync := limit.NewSync(1, time.Second)
 
+	assert.Equal(t, 0, sync.Len())
 	sync.Close()
 }

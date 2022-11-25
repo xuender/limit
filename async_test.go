@@ -16,6 +16,7 @@ func TestNewLimiter(t *testing.T) {
 
 	ass.Nil(lim.Add(1))
 	ass.Nil(lim.Add(1))
+	ass.Equal(1, lim.Len())
 	ass.NotNil(lim.Add(1))
 
 	lim = limit.NewAsync(1, time.Millisecond, func(num int) { time.Sleep(time.Microsecond) })

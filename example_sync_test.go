@@ -15,7 +15,7 @@ func ExampleSync() {
 	_ = limiter.Wait()
 	_ = limiter.Wait()
 
-	fmt.Println(time.Since(start).Milliseconds())
+	fmt.Println(time.Since(start).Milliseconds() / 10 * 10)
 
 	// Output:
 	// 300
