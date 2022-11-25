@@ -8,6 +8,8 @@ type Sync struct {
 }
 
 // NewSync returns a new sync rate limit.
+//
+// Play: https://go.dev/play/p/tFrkT_j1obb
 func NewSync(qps int, timeOut time.Duration) *Sync {
 	limiter := NewAsync(qps, timeOut, func(end chan<- struct{}) {
 		end <- struct{}{}

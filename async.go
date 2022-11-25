@@ -13,6 +13,8 @@ type Async[T any] struct {
 }
 
 // NewAsync returns a new async rate limit.
+//
+// Play: https://go.dev/play/p/W9gYA_109Vz
 func NewAsync[T any](qps int, timeOut time.Duration, yield func(T)) *Async[T] {
 	limiter := &Async[T]{yield: yield}
 
