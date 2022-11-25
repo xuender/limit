@@ -12,7 +12,7 @@ Golang channel based rate limiter.
 
 * supports asynchronous and synchronous calls.
 * simple middleware to rate limit HTTP requests.
-* timeout request immediately returns an error.
+* requests that may timeout will returns an error immediately.
 * call order.
 
 ## 💡 Usage
@@ -28,7 +28,7 @@ import "github.com/xuender/limit"
 ```go
 start := time.Now()
 limiter := limit.NewAsync(10, time.Second, func(num int) {
-  fmt.Println(time.Since(start)/time.Millisecond*time.Millisecond, num)
+  fmt.Println(time.Since(start), num)
 })
 
 _ = limiter.Add(1)
@@ -42,6 +42,8 @@ time.Sleep(time.Second)
 // 200ms 2
 // 300ms 3
 ```
+
+[[play](https://go.dev/play/p/W9gYA_109Vz)]
 
 ### Sync
 
@@ -59,20 +61,20 @@ fmt.Println(time.Since(start) / time.Millisecond * time.Millisecond)
 // 300ms
 ```
 
+[[play](https://go.dev/play/p/tFrkT_j1obb)]
+
 ### Handler
 
 ```go
-http.Handle("/",
-  limit.FuncHandler(
-    1000,
-    time.Second*10,
-    func(w http.ResponseWriter, r *http.Request){
-      _, _ = io.WriteString(w, "PONG")
-    },
-  ),
-)
+http.Handle("/", limit.FuncHandler(1000, time.Second*10,
+  func(w http.ResponseWriter, r *http.Request) {
+    _, _ = io.WriteString(w, "PONG")
+  },
+))
 http.ListenAndServe(":8080", nil)
 ```
+
+[[play](https://go.dev/play/p/oAoIZynIdkn)]
 
 ## 📝 License
 
