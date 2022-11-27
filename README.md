@@ -55,7 +55,7 @@ _ = limiter.Wait()
 _ = limiter.Wait()
 _ = limiter.Wait()
 
-fmt.Println(time.Since(start) / time.Millisecond * time.Millisecond)
+fmt.Println(time.Since(start))
 
 // Output:
 // 300ms
