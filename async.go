@@ -2,7 +2,7 @@ package limit
 
 import "time"
 
-const _timeOut = time.Microsecond * 10
+const _timeOut = time.Microsecond * 100
 
 // Async channel based async rate limit.
 type Async[T any] struct {
