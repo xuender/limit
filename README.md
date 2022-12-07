@@ -75,7 +75,7 @@ client := redis.NewClient(&redis.Options{
   DB:       0,
 })
 start := time.Now()
-limiter := limit.NewRdb(client, "key", 1000)
+limiter := limit.NewRdb(client, "key", 1000, time.Second)
 
 _ = limiter.Wait()
 _ = limiter.Wait()
@@ -84,7 +84,7 @@ _ = limiter.Wait()
 fmt.Println(time.Since(start))
 ```
 
-[[play]](https://go.dev/play/p/XA21uHBeaIU)
+[[play]](https://go.dev/play/p/SgAqdQRYhiK)
 
 ### Handler
 

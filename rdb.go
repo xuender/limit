@@ -16,16 +16,18 @@ type Rdb struct {
 	interval time.Duration
 	last     time.Time
 	mutex    sync.Mutex
+	timeOut  time.Duration
 }
 
 // NewRdb returns redis limiter.
-func NewRdb(client redis.Cmdable, key string, qps int) *Rdb {
+func NewRdb(client redis.Cmdable, key string, qps int, timeOut time.Duration) *Rdb {
 	return &Rdb{
 		client:   client,
 		key:      key,
 		old:      0,
 		interval: time.Second / time.Duration(qps),
 		mutex:    sync.Mutex{},
+		timeOut:  timeOut,
 	}
 }
 
@@ -51,9 +53,18 @@ func (p *Rdb) Wait() error {
 	}
 
 	interval := p.interval * time.Duration(num-p.old)
-	p.old = num
 	dur := time.Since(p.last)
 	sleep := interval - dur
+
+	if sleep >= p.timeOut {
+		if _, err := p.client.Decr(context.Background(), p.key).Result(); err != nil {
+			return err
+		}
+
+		return ErrTimeOut
+	}
+
+	p.old = num
 
 	switch {
 	case sleep > 0:

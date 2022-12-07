@@ -14,7 +14,7 @@ import (
 func TestNewRdb(t *testing.T) {
 	t.Parallel()
 
-	limiter := limit.NewRdb(nil, "key", -1)
+	limiter := limit.NewRdb(nil, "key", -1, time.Second)
 	assert.NotNil(t, limiter.Wait())
 }
 
@@ -22,7 +22,7 @@ func TestRdb_Wait(t *testing.T) {
 	t.Parallel()
 	ctrl := gomock.NewController(t)
 	client := rdb_mock.NewMockCmdable(ctrl)
-	limiter := limit.NewRdb(client, "key", 1000)
+	limiter := limit.NewRdb(client, "key", 1000, time.Second)
 	cmd1 := new(redis.IntCmd)
 	cmd2 := new(redis.IntCmd)
 
@@ -41,12 +41,52 @@ func TestRdb_Wait_Error(t *testing.T) {
 	t.Parallel()
 	ctrl := gomock.NewController(t)
 	client := rdb_mock.NewMockCmdable(ctrl)
-	limiter := limit.NewRdb(client, "key", 1000)
+	limiter := limit.NewRdb(client, "key", 1000, time.Second)
 	cmd := new(redis.IntCmd)
 
 	cmd.SetVal(3)
 	cmd.SetErr(limit.ErrKey)
 	client.EXPECT().Incr(gomock.Any(), "key").Return(cmd).MinTimes(0).MaxTimes(3)
 
+	assert.NotNil(t, limiter.Wait())
+}
+
+func TestRdb_Wait_Timeout(t *testing.T) {
+	t.Parallel()
+	ctrl := gomock.NewController(t)
+	client := rdb_mock.NewMockCmdable(ctrl)
+	limiter := limit.NewRdb(client, "key", 1, time.Millisecond)
+	cmd := new(redis.IntCmd)
+	cmd2 := new(redis.IntCmd)
+
+	cmd.SetVal(1)
+	cmd2.SetVal(2)
+	client.EXPECT().Incr(gomock.Any(), "key").Return(cmd).MinTimes(0).MaxTimes(1)
+	client.EXPECT().Incr(gomock.Any(), "key").Return(cmd2).MinTimes(1).MaxTimes(3)
+	client.EXPECT().Decr(gomock.Any(), "key").Return(cmd).MinTimes(0).MaxTimes(3)
+
+	assert.Nil(t, limiter.Wait())
+	assert.NotNil(t, limiter.Wait())
+}
+
+func TestRdb_Wait_Timeout_error(t *testing.T) {
+	t.Parallel()
+	ctrl := gomock.NewController(t)
+	client := rdb_mock.NewMockCmdable(ctrl)
+	limiter := limit.NewRdb(client, "key", 1, time.Millisecond)
+	cmd := new(redis.IntCmd)
+	cmd2 := new(redis.IntCmd)
+	cmd3 := new(redis.IntCmd)
+
+	cmd.SetVal(1)
+	cmd2.SetVal(2)
+	cmd3.SetVal(3)
+	cmd3.SetErr(limit.ErrKey)
+
+	client.EXPECT().Incr(gomock.Any(), "key").Return(cmd).MinTimes(0).MaxTimes(1)
+	client.EXPECT().Incr(gomock.Any(), "key").Return(cmd2).MinTimes(1).MaxTimes(3)
+	client.EXPECT().Decr(gomock.Any(), "key").Return(cmd3).MinTimes(0).MaxTimes(3)
+
+	assert.Nil(t, limiter.Wait())
 	assert.NotNil(t, limiter.Wait())
 }

@@ -15,7 +15,7 @@ func main() {
 		Password: "",
 		DB:       0,
 	})
-	limiter := limit.NewRdb(client, "limit_test", 1000)
+	limiter := limit.NewRdb(client, "limit_test", 1000, time.Second)
 
 	go func() {
 		for {
