@@ -12,7 +12,7 @@ func main() {
 	group := sync.WaitGroup{}
 	group.Add(100)
 
-	for i := 0; i < 100; i++ {
+	for i := 0; i < 1000; i++ {
 		go func(num int) {
 			res, _ := http.Get("http://127.0.0.1:8080")
 

@@ -23,6 +23,7 @@ tools:
 	go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest
 	go get -t -u golang.org/x/tools/cmd/cover
 	go install github.com/sonatype-nexus-community/nancy@latest
+	go install github.com/golang/mock/mockgen@latest
 	go mod tidy
 
 lint:
@@ -38,3 +39,6 @@ outdated: tools
 
 weight: tools
 	goweight
+
+mockgen:
+	mockgen -package redis -destination ./mock/redis.go  github.com/go-redis/redis/v8 Cmdable

@@ -1,0 +1,52 @@
+package limit_test
+
+import (
+	"testing"
+	"time"
+
+	"github.com/go-redis/redis/v8"
+	"github.com/golang/mock/gomock"
+	"github.com/stretchr/testify/assert"
+	"github.com/xuender/limit"
+	rdb_mock "github.com/xuender/limit/mock"
+)
+
+func TestNewRdb(t *testing.T) {
+	t.Parallel()
+
+	limiter := limit.NewRdb(nil, "key", -1)
+	assert.NotNil(t, limiter.Wait())
+}
+
+func TestRdb_Wait(t *testing.T) {
+	t.Parallel()
+	ctrl := gomock.NewController(t)
+	client := rdb_mock.NewMockCmdable(ctrl)
+	limiter := limit.NewRdb(client, "key", 1000)
+	cmd1 := new(redis.IntCmd)
+	cmd2 := new(redis.IntCmd)
+
+	cmd1.SetVal(1)
+	cmd2.SetVal(2)
+	client.EXPECT().Incr(gomock.Any(), "key").Return(cmd1).MinTimes(0).MaxTimes(1)
+	client.EXPECT().Incr(gomock.Any(), "key").Return(cmd2).MinTimes(1).MaxTimes(20)
+
+	assert.Nil(t, limiter.Wait())
+	assert.Nil(t, limiter.Wait())
+	time.Sleep(time.Millisecond * 4)
+	assert.Nil(t, limiter.Wait())
+}
+
+func TestRdb_Wait_Error(t *testing.T) {
+	t.Parallel()
+	ctrl := gomock.NewController(t)
+	client := rdb_mock.NewMockCmdable(ctrl)
+	limiter := limit.NewRdb(client, "key", 1000)
+	cmd := new(redis.IntCmd)
+
+	cmd.SetVal(3)
+	cmd.SetErr(limit.ErrKey)
+	client.EXPECT().Incr(gomock.Any(), "key").Return(cmd).MinTimes(0).MaxTimes(3)
+
+	assert.NotNil(t, limiter.Wait())
+}

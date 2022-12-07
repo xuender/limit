@@ -10,7 +10,7 @@ import (
 )
 
 func main() {
-	http.Handle("/", limit.FuncHandler(1, time.Second*3, ping))
+	http.Handle("/", limit.FuncHandler(1000, time.Second*3, ping))
 	// nolint
 	http.ListenAndServe(":8080", nil)
 }

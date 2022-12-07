@@ -1,4 +1,4 @@
-# limit
+# Limit
 
 [![Go Report Card](https://goreportcard.com/badge/github.com/xuender/limit)](https://goreportcard.com/report/github.com/xuender/limit)
 [![tag](https://img.shields.io/github/tag/xuender/limit.svg)](https://github.com/xuender/limit/releases)
@@ -14,6 +14,7 @@ Golang channel based rate limiter.
 * simple middleware to rate limit HTTP requests.
 * requests that may timeout will returns an error immediately.
 * call order.
+* redis based distributed limiter.
 
 ## 💡 Usage
 
@@ -62,6 +63,28 @@ fmt.Println(time.Since(start))
 ```
 
 [[play](https://go.dev/play/p/tFrkT_j1obb)]
+
+### Rdb
+
+redis based distributed limiter.
+
+```go
+client := redis.NewClient(&redis.Options{
+  Addr:     "localhost:6379",
+  Password: "",
+  DB:       0,
+})
+start := time.Now()
+limiter := limit.NewRdb(client, "key", 1000)
+
+_ = limiter.Wait()
+_ = limiter.Wait()
+_ = limiter.Wait()
+
+fmt.Println(time.Since(start))
+```
+
+[[play]](https://go.dev/play/p/XA21uHBeaIU)
 
 ### Handler
 
