@@ -55,10 +55,6 @@ func (p *Rdb) Wait() error {
 	dur := time.Since(p.last)
 	sleep := interval - dur
 
-	if sleep > 0 {
-		time.Sleep(sleep)
-	}
-
 	switch {
 	case sleep > 0:
 		time.Sleep(sleep)
