@@ -103,4 +103,4 @@ http.ListenAndServe(":8080", nil)
 
 © ender, 2022~time.Now
 
-[MIT License](https://github.com/xuender/limit/blob/master/License)
+[MIT License](https://github.com/xuender/limit/blob/master/LICENSE)
