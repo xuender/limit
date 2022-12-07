@@ -1,4 +1,12 @@
 
+1.0.4 / 2022-12-07
+==================
+
+* feat: rdb add timeout
+* fix: repeat Sleep
+* fix: time out 1 millisecond
+* doc: LICENSE
+
 1.0.3 / 2022-12-07
 ==================
 
