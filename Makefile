@@ -41,4 +41,4 @@ weight: tools
 	goweight
 
 mockgen:
-	mockgen -package redis -destination ./mock/redis.go  github.com/go-redis/redis/v8 Cmdable
+	mockgen -package redis -destination ./rdb/mock/redis.go  github.com/go-redis/redis/v8 Cmdable

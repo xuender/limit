@@ -64,7 +64,7 @@ fmt.Println(time.Since(start))
 
 [[play](https://go.dev/play/p/tFrkT_j1obb)]
 
-### Rdb
+### rdb.Distributed
 
 redis based distributed limiter.
 
@@ -75,7 +75,7 @@ client := redis.NewClient(&redis.Options{
   DB:       0,
 })
 start := time.Now()
-limiter := limit.NewRdb(client, "key", 1000, time.Second)
+limiter := rdb.NewDistributed(client, "key", 1000, time.Second)
 
 _ = limiter.Wait()
 _ = limiter.Wait()
@@ -98,6 +98,10 @@ http.ListenAndServe(":8080", nil)
 ```
 
 [[play](https://go.dev/play/p/oAoIZynIdkn)]
+
+## 😁 Cover
+
+![codecov](https://codecov.io/gh/xuender/limit/branch/main/graphs/tree.svg?token=CDCXOD9XYO)
 
 ## 📝 License
 

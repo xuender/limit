@@ -1,4 +1,4 @@
-package limit_test
+package rdb_test
 
 import (
 	"testing"
@@ -8,13 +8,14 @@ import (
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
 	"github.com/xuender/limit"
-	rdb_mock "github.com/xuender/limit/mock"
+	"github.com/xuender/limit/rdb"
+	rdb_mock "github.com/xuender/limit/rdb/mock"
 )
 
-func TestNewRdb(t *testing.T) {
+func TestNewDistributed(t *testing.T) {
 	t.Parallel()
 
-	limiter := limit.NewRdb(nil, "key", -1, time.Second)
+	limiter := rdb.NewDistributed(nil, "key", -1, time.Second)
 	assert.NotNil(t, limiter.Wait())
 }
 
@@ -22,7 +23,7 @@ func TestRdb_Wait(t *testing.T) {
 	t.Parallel()
 	ctrl := gomock.NewController(t)
 	client := rdb_mock.NewMockCmdable(ctrl)
-	limiter := limit.NewRdb(client, "key", 1000, time.Second)
+	limiter := rdb.NewDistributed(client, "key", 1000, time.Second)
 	cmd1 := new(redis.IntCmd)
 	cmd2 := new(redis.IntCmd)
 
@@ -41,7 +42,7 @@ func TestRdb_Wait_Error(t *testing.T) {
 	t.Parallel()
 	ctrl := gomock.NewController(t)
 	client := rdb_mock.NewMockCmdable(ctrl)
-	limiter := limit.NewRdb(client, "key", 1000, time.Second)
+	limiter := rdb.NewDistributed(client, "key", 1000, time.Second)
 	cmd := new(redis.IntCmd)
 
 	cmd.SetVal(3)
@@ -55,7 +56,7 @@ func TestRdb_Wait_Timeout(t *testing.T) {
 	t.Parallel()
 	ctrl := gomock.NewController(t)
 	client := rdb_mock.NewMockCmdable(ctrl)
-	limiter := limit.NewRdb(client, "key", 1, time.Millisecond)
+	limiter := rdb.NewDistributed(client, "key", 1, time.Millisecond)
 	cmd := new(redis.IntCmd)
 	cmd2 := new(redis.IntCmd)
 
@@ -73,7 +74,7 @@ func TestRdb_Wait_Timeout_error(t *testing.T) {
 	t.Parallel()
 	ctrl := gomock.NewController(t)
 	client := rdb_mock.NewMockCmdable(ctrl)
-	limiter := limit.NewRdb(client, "key", 1, time.Millisecond)
+	limiter := rdb.NewDistributed(client, "key", 1, time.Millisecond)
 	cmd := new(redis.IntCmd)
 	cmd2 := new(redis.IntCmd)
 	cmd3 := new(redis.IntCmd)

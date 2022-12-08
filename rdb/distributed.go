@@ -1,4 +1,4 @@
-package limit
+package rdb
 
 import (
 	"context"
@@ -6,10 +6,11 @@ import (
 	"time"
 
 	"github.com/go-redis/redis/v8"
+	"github.com/xuender/limit"
 )
 
-// Rdb is redis limiter.
-type Rdb struct {
+// Distributed is redis limiter.
+type Distributed struct {
 	client   redis.Cmdable
 	key      string
 	old      int64
@@ -19,9 +20,9 @@ type Rdb struct {
 	timeOut  time.Duration
 }
 
-// NewRdb returns redis limiter.
-func NewRdb(client redis.Cmdable, key string, qps int, timeOut time.Duration) *Rdb {
-	return &Rdb{
+// NewDistributed returns redis limiter.
+func NewDistributed(client redis.Cmdable, key string, qps int, timeOut time.Duration) *Distributed {
+	return &Distributed{
 		client:   client,
 		key:      key,
 		old:      0,
@@ -32,9 +33,9 @@ func NewRdb(client redis.Cmdable, key string, qps int, timeOut time.Duration) *R
 }
 
 // Wait is concurrent flow control.
-func (p *Rdb) Wait() error {
+func (p *Distributed) Wait() error {
 	if p.interval <= 0 {
-		return ErrQPS
+		return limit.ErrQPS
 	}
 
 	p.mutex.Lock()
@@ -61,7 +62,7 @@ func (p *Rdb) Wait() error {
 			return err
 		}
 
-		return ErrTimeOut
+		return limit.ErrTimeOut
 	}
 
 	p.old = num
