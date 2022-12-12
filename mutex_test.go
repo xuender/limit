@@ -17,10 +17,7 @@ func TestMutex_Wait(t *testing.T) {
 	go func() {
 		time.Sleep(time.Millisecond * 300)
 		ass.Nil(mutex.Wait())
-	}()
-
-	go func() {
-		time.Sleep(time.Millisecond * 500)
+		time.Sleep(time.Millisecond * 200)
 		ass.NotNil(mutex.Wait())
 	}()
 
