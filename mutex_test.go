@@ -8,22 +8,6 @@ import (
 	"github.com/xuender/limit"
 )
 
-func TestMutex_Wait(t *testing.T) {
-	t.Parallel()
-
-	mutex := limit.NewMutex(1, time.Second)
-	ass := assert.New(t)
-
-	go func() {
-		time.Sleep(time.Millisecond * 300)
-		ass.Nil(mutex.Wait())
-		time.Sleep(time.Millisecond * 200)
-		ass.NotNil(mutex.Wait())
-	}()
-
-	ass.Nil(mutex.Wait())
-}
-
 func TestMutex_Try(t *testing.T) {
 	t.Parallel()
 
