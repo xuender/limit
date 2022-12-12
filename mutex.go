@@ -17,7 +17,7 @@ type Mutex struct {
 //
 // qps less than 1 unlimited.
 //
-// Play: https://go.dev/play/p/tFrkT_j1obb
+// Play: https://go.dev/play/p/ogcvT7o4ENI
 func NewMutex(qps int, timeOut time.Duration) *Mutex {
 	return &Mutex{
 		interval: time.Second / time.Duration(qps),

@@ -78,7 +78,7 @@ fmt.Println(time.Since(start))
 // 300ms
 ```
 
-[[play](https://go.dev/play/p/tFrkT_j1obb)]
+[[play](https://go.dev/play/p/ogcvT7o4ENI)]
 
 ### rdb.Distributed
 
