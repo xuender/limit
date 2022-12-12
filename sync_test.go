@@ -8,30 +8,22 @@ import (
 	"github.com/xuender/limit"
 )
 
-func TestSync_Wait(t *testing.T) {
+func TestMutex_Try(t *testing.T) {
 	t.Parallel()
 
-	sync := limit.NewSync(1, time.Second)
+	mutex := limit.NewSync(10, time.Second)
 	ass := assert.New(t)
 
-	go func() {
-		time.Sleep(time.Millisecond * 300)
-		ass.Nil(sync.Wait())
-	}()
-
-	go func() {
-		time.Sleep(time.Millisecond * 500)
-		ass.NotNil(sync.Wait())
-	}()
-
-	ass.Nil(sync.Wait())
+	ass.NotNil(mutex.Try())
+	time.Sleep(time.Millisecond * 100)
+	ass.Nil(mutex.Try())
 }
 
-func TestSync_Close(t *testing.T) {
+func TestMutex_Timeout(t *testing.T) {
 	t.Parallel()
 
-	sync := limit.NewSync(1, time.Second)
+	mutex := limit.NewSync(1, time.Millisecond)
+	ass := assert.New(t)
 
-	assert.Equal(t, 0, sync.Len())
-	sync.Close()
+	ass.NotNil(mutex.Wait())
 }

@@ -1,44 +1,70 @@
 package limit
 
-import "time"
+import (
+	"sync"
+	"time"
+)
 
-// Sync channel based sync rate limit.
-type Sync struct {
-	limiter *Async[chan<- struct{}]
+// Mutex rate limit.
+type Mutex struct {
+	interval time.Duration
+	last     time.Time
+	mutex    sync.Mutex
+	timeout  time.Duration
 }
 
-// NewSync returns a new sync rate limit.
+// NewSync returns a new mutex rate limit.
 //
 // qps less than 1 unlimited.
 //
-// Play: https://go.dev/play/p/tFrkT_j1obb
-func NewSync(qps int, timeOut time.Duration) *Sync {
-	limiter := NewAsync(qps, timeOut, func(end chan<- struct{}) {
-		end <- struct{}{}
-	})
-
-	return &Sync{limiter: limiter}
+// Play: https://go.dev/play/p/ogcvT7o4ENI
+func NewSync(qps int, timeOut time.Duration) *Mutex {
+	return &Mutex{
+		interval: time.Second / time.Duration(qps),
+		mutex:    sync.Mutex{},
+		last:     time.Now(),
+		timeout:  timeOut,
+	}
 }
 
 // Wait and returns a error.
-func (p *Sync) Wait() error {
-	end := make(chan struct{})
+func (p *Mutex) Wait() error {
+	p.mutex.Lock()
+	defer p.mutex.Unlock()
 
-	if err := p.limiter.Add(end); err != nil {
-		return err
+	if wait := p.waiting(); wait > 0 {
+		if wait > p.timeout {
+			return ErrTimeOut
+		}
+
+		time.Sleep(wait)
+
+		p.last = p.last.Add(p.interval)
 	}
-
-	<-end
 
 	return nil
 }
 
-// Close channel.
-func (p *Sync) Close() {
-	p.limiter.Close()
+func (p *Mutex) waiting() time.Duration {
+	dru := time.Since(p.last)
+
+	if sleep := p.interval - dru; sleep > 0 {
+		return sleep
+	}
+
+	p.last = p.last.Add(dru)
+
+	return 0
 }
 
-// Len returns channel length.
-func (p *Sync) Len() int {
-	return p.limiter.Len()
+// Try and returns a error.
+func (p *Mutex) Try() error {
+	p.mutex.Lock()
+	defer p.mutex.Unlock()
+
+	if p.waiting() > 0 {
+		return ErrWait
+	}
+
+	return nil
 }

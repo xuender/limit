@@ -62,22 +62,6 @@ fmt.Println(time.Since(start))
 // 300ms
 ```
 
-### Mutex
-
-```go
-start := time.Now()
-limiter := limit.NewMutex(10, time.Second)
-
-_ = limiter.Wait()
-_ = limiter.Wait()
-_ = limiter.Wait()
-
-fmt.Println(time.Since(start))
-
-// Output:
-// 300ms
-```
-
 [[play](https://go.dev/play/p/ogcvT7o4ENI)]
 
 ### rdb.Distributed
