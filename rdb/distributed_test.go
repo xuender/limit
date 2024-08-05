@@ -1,6 +1,7 @@
 package rdb_test
 
 import (
+	"context"
 	"testing"
 	"time"
 
@@ -16,7 +17,7 @@ func TestNewDistributed(t *testing.T) {
 	t.Parallel()
 
 	limiter := rdb.NewDistributed(nil, "key", -1, time.Second)
-	assert.NotNil(t, limiter.Wait())
+	assert.NotNil(t, limiter.Wait(context.Background()))
 }
 
 func TestRdb_Wait(t *testing.T) {
@@ -32,10 +33,10 @@ func TestRdb_Wait(t *testing.T) {
 	client.EXPECT().Incr(gomock.Any(), "key").Return(cmd1).MinTimes(0).MaxTimes(1)
 	client.EXPECT().Incr(gomock.Any(), "key").Return(cmd2).MinTimes(1).MaxTimes(20)
 
-	assert.Nil(t, limiter.Wait())
-	assert.Nil(t, limiter.Wait())
+	assert.Nil(t, limiter.Wait(context.Background()))
+	assert.Nil(t, limiter.Wait(context.Background()))
 	time.Sleep(time.Millisecond * 4)
-	assert.Nil(t, limiter.Wait())
+	assert.Nil(t, limiter.Wait(context.Background()))
 }
 
 func TestRdb_Wait_Error(t *testing.T) {
@@ -49,7 +50,7 @@ func TestRdb_Wait_Error(t *testing.T) {
 	cmd.SetErr(limit.ErrKey)
 	client.EXPECT().Incr(gomock.Any(), "key").Return(cmd).MinTimes(0).MaxTimes(3)
 
-	assert.NotNil(t, limiter.Wait())
+	assert.NotNil(t, limiter.Wait(context.Background()))
 }
 
 func TestRdb_Wait_Timeout(t *testing.T) {
@@ -66,8 +67,8 @@ func TestRdb_Wait_Timeout(t *testing.T) {
 	client.EXPECT().Incr(gomock.Any(), "key").Return(cmd2).MinTimes(1).MaxTimes(3)
 	client.EXPECT().Decr(gomock.Any(), "key").Return(cmd).MinTimes(0).MaxTimes(3)
 
-	assert.Nil(t, limiter.Wait())
-	assert.NotNil(t, limiter.Wait())
+	assert.Nil(t, limiter.Wait(context.Background()))
+	assert.NotNil(t, limiter.Wait(context.Background()))
 }
 
 func TestRdb_Wait_Timeout_error(t *testing.T) {
@@ -88,6 +89,6 @@ func TestRdb_Wait_Timeout_error(t *testing.T) {
 	client.EXPECT().Incr(gomock.Any(), "key").Return(cmd2).MinTimes(1).MaxTimes(3)
 	client.EXPECT().Decr(gomock.Any(), "key").Return(cmd3).MinTimes(0).MaxTimes(3)
 
-	assert.Nil(t, limiter.Wait())
-	assert.NotNil(t, limiter.Wait())
+	assert.Nil(t, limiter.Wait(context.Background()))
+	assert.NotNil(t, limiter.Wait(context.Background()))
 }

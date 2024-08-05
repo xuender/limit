@@ -33,7 +33,7 @@ func NewDistributed(client redis.Cmdable, key string, qps int, timeOut time.Dura
 }
 
 // Wait is concurrent flow control.
-func (p *Distributed) Wait() error {
+func (p *Distributed) Wait(ctx context.Context) error {
 	if p.interval <= 0 {
 		return limit.ErrQPS
 	}
@@ -41,7 +41,7 @@ func (p *Distributed) Wait() error {
 	p.mutex.Lock()
 	defer p.mutex.Unlock()
 
-	num, err := p.client.Incr(context.Background(), p.key).Result()
+	num, err := p.client.Incr(ctx, p.key).Result()
 	if err != nil {
 		return err
 	}

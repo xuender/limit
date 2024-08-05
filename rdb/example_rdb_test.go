@@ -1,6 +1,7 @@
 package rdb_test
 
 import (
+	"context"
 	"fmt"
 	"time"
 
@@ -17,10 +18,11 @@ func ExampleDistributed() {
 	})
 	start := time.Now()
 	limiter := rdb.NewDistributed(client, "key", 1000, time.Second)
+	ctx := context.Background()
 
-	_ = limiter.Wait()
-	_ = limiter.Wait()
-	_ = limiter.Wait()
+	_ = limiter.Wait(ctx)
+	_ = limiter.Wait(ctx)
+	_ = limiter.Wait(ctx)
 
 	fmt.Println(time.Since(start))
 }
