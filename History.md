@@ -1,4 +1,12 @@
 
+1.0.6 / 2024-08-05
+==================
+
+* feat: limit add context
+* feat: rename mutex to sync
+* test: timeout
+* test: timeout
+
 1.0.5 / 2022-12-12
 ==================
 
